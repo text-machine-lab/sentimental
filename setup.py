@@ -4,6 +4,9 @@ setup(
     name='sentimental',
     version='0.1.',
     packages=find_packages(),
+    package_data={
+        'sentimental': ['word_list/*.csv'],
+    },
     install_requires=[],
     author='Alexey Romanov',
     author_email='aromanov@cs.uml.edu',
