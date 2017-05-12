@@ -1,11 +1,16 @@
 import re
 import os
-import sys
 import csv
 from collections import defaultdict
 
+
 class Sentimental(object):
     def __init__(self, word_list=None, negation=None):
+        if word_list is None and negation is None:
+            base_dir = os.path.dirname(__file__)
+            word_list = [os.path.join(base_dir, p) for p in ['./word_list/afinn.csv', './word_list/russian.csv']]
+            negation = os.path.join(base_dir, './word_list/negations.csv')
+
         self.word_list = {}
         self.negations = set()
 
@@ -14,9 +19,10 @@ class Sentimental(object):
         for negations_filename in self.__to_arg_list(negation):
             self.load_neagations(negations_filename)
 
-        self.__negation_skip = set(['a', 'an', 'so', 'too'])
+        self.__negation_skip = {'a', 'an', 'so', 'too'}
 
-    def __to_arg_list(self, obj):
+    @staticmethod
+    def __to_arg_list(obj):
         if obj is not None:
             if not isinstance(obj, list):
                 obj = [obj]
@@ -25,13 +31,13 @@ class Sentimental(object):
         return obj
 
     def __is_prefixed_by_negation(self, token_idx, tokens):
-#         True if i != 0 and tokens[i - 1] in self.negations else False
+        #   True if i != 0 and tokens[i - 1] in self.negations else False
         prev_idx = token_idx - 1
         if tokens[prev_idx] in self.__negation_skip:
             prev_idx -= 1
 
         is_prefixed = False
-        if token_idx > 0 and  prev_idx >= 0 and tokens[prev_idx] in self.negations:
+        if token_idx > 0 and prev_idx >= 0 and tokens[prev_idx] in self.negations:
             is_prefixed = True
 
         return is_prefixed
@@ -42,11 +48,10 @@ class Sentimental(object):
             negations = set([row['token'] for row in reader])
         self.negations |= negations
 
-
     def load_word_list(self, filename):
         with open(filename, 'r') as f:
             reader = csv.DictReader(f)
-            word_list = {row['word']:float(row['score']) for row in reader}
+            word_list = {row['word']: float(row['score']) for row in reader}
         self.word_list.update(word_list)
 
     def analyze(self, sentence):
@@ -61,9 +66,9 @@ class Sentimental(object):
             if token in self.word_list and not is_prefixed_by_negation:
                 score = self.word_list[token]
 
-                type = 'negative' if score < 0 else 'positive'
-                scores[type] += score
-                words[type].append(token)
+                score_type = 'negative' if score < 0 else 'positive'
+                scores[score_type] += score
+                words[score_type].append(token)
 
         result = {
             'score': scores['positive'] + scores['negative'],
@@ -76,7 +81,8 @@ class Sentimental(object):
 
 
 def main():
-    sent = Sentimental(word_list=['./word_list/afinn.csv', './word_list/russian.csv'], negation='./word_list/negations.csv')
+    sent = Sentimental(word_list=['./word_list/afinn.csv', './word_list/russian.csv'],
+                       negation='./word_list/negations.csv')
 
     sentences = [
         'Today is a very good day!',
