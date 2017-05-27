@@ -60,6 +60,7 @@ class Sentimental(object):
 
         scores = defaultdict(float)
         words = defaultdict(list)
+        comparative = 0
 
         for i, token in enumerate(tokens):
             is_prefixed_by_negation = self.__is_prefixed_by_negation(i, tokens)
@@ -70,11 +71,14 @@ class Sentimental(object):
                 scores[score_type] += score
                 words[score_type].append(token)
 
+        if len(tokens) > 0:
+            comparative = (scores['positive'] + scores['negative']) / len(tokens)
+
         result = {
             'score': scores['positive'] + scores['negative'],
             'positive': scores['positive'],
             'negative': scores['negative'],
-            'comparative': (scores['positive'] + scores['negative']) / len(tokens),
+            'comparative': comparative,
         }
 
         return result
