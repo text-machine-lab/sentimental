@@ -33,3 +33,16 @@ The `result` is a dictionary with four fields:
 The filed `score` reflects the overall sentiment of the input data, 
 and the `comparative` field is normalized by the length of the input, 
 so it can be used to compare the sentiment of different texts.
+
+## Citation
+If you've found this project useful, please cite the following paper:
+```
+@inproceedings{rumshisky2017combining,
+  title={Combining network and language indicators for tracking conflict intensity},
+  author={Rumshisky, Anna and Gronas, Mikhail and Potash, Peter and Dubov, Mikhail and Romanov, Alexey and Kulshreshtha, Saurabh and Gribov, Alex},
+  booktitle={International Conference on Social Informatics},
+  pages={391--404},
+  year={2017},
+  organization={Springer}
+}
+```
