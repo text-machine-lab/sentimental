@@ -4,8 +4,14 @@ import csv
 from collections import defaultdict
 
 
+def default_tokenize(sentence):
+    sentence_clean = re.sub(r'[^\w ]', ' ', sentence.lower())
+    tokens = sentence_clean.split()
+    return tokens
+
+
 class Sentimental(object):
-    def __init__(self, word_list=None, negation=None):
+    def __init__(self, word_list=None, negation=None, tokenize=default_tokenize):
         if word_list is None and negation is None:
             base_dir = os.path.dirname(__file__)
             word_list = [os.path.join(base_dir, p) for p in ['./word_list/afinn.csv', './word_list/russian.csv']]
@@ -20,6 +26,7 @@ class Sentimental(object):
             self.load_neagations(negations_filename)
 
         self.__negation_skip = {'a', 'an', 'so', 'too'}
+        self.tokenize = tokenize
 
     @staticmethod
     def __to_arg_list(obj):
@@ -55,8 +62,7 @@ class Sentimental(object):
         self.word_list.update(word_list)
 
     def analyze(self, sentence):
-        sentence_clean = re.sub(r'[^\w ]', ' ', sentence.lower())
-        tokens = sentence_clean.split()
+        tokens = self.tokenize(sentence)
 
         scores = defaultdict(float)
         words = defaultdict(list)
